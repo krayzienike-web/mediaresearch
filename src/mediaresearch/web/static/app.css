@@ -1,0 +1,81 @@
+/* Цвета тональности: расходящаяся шкала красный ↔ серый ↔ синий.
+   Проверены на различимость при дальтонизме отдельно для светлой и тёмной темы. */
+:root {
+  --s-negative: #e34948;
+  --s-neutral: #8f8e86;
+  --s-positive: #2a78d6;
+  --s-unrated: #8f8e86;
+  --chart-grid: rgba(0, 0, 0, 0.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --s-negative: #e66767;
+    --s-neutral: #b5b4ab;
+    --s-positive: #3987e5;
+    --s-unrated: #b5b4ab;
+    --chart-grid: rgba(255, 255, 255, 0.1);
+  }
+}
+:root[data-theme="dark"] {
+  --s-negative: #e66767;
+  --s-neutral: #b5b4ab;
+  --s-positive: #3987e5;
+  --s-unrated: #b5b4ab;
+  --chart-grid: rgba(255, 255, 255, 0.1);
+}
+
+.muted { color: var(--pico-muted-color); }
+
+/* Фильтры в одну строку, на телефоне переносятся */
+.filters { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 1rem; }
+/* Pico растягивает поля и кнопки на всю ширину: внутри фильтров отменяем */
+.filters select, .filters input:not([type="checkbox"]), .filters button, .filters [role="button"] {
+  width: auto; margin: 0; flex: 0 1 auto;
+}
+.filters input[type="search"] { flex: 1 1 14rem; }
+.filters input[type="date"] { flex: 0 1 11rem; }
+.filters label.inline { display: flex; gap: 0.35rem; align-items: center; white-space: nowrap; }
+.filters button, .filters [role="button"] { padding: 0.45rem 0.9rem; }
+
+.summary { margin-bottom: 1rem; }
+
+/* Карточка упоминания */
+.mention { padding: 1rem 1.25rem; margin-bottom: 0.75rem; }
+.mention.irrelevant { opacity: 0.55; }
+.mention .meta { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; font-size: 0.85rem;
+  color: var(--pico-muted-color); margin: -1rem -1.25rem 0.75rem; padding: 0.5rem 1.25rem; }
+.mention .brand { font-weight: 600; color: var(--pico-color); }
+.mention .tag { border: 1px solid currentColor; border-radius: 4px; padding: 0 0.35rem; }
+.mention h4 { margin-bottom: 0.5rem; font-size: 1.05rem; }
+.mention .text { white-space: pre-line; margin-bottom: 0.5rem; overflow-wrap: anywhere; }
+.mention .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+  margin: 0.5rem -1.25rem -1rem; padding: 0.5rem 1.25rem; }
+.mention .actions button { padding: 0.2rem 0.6rem; font-size: 0.8rem; margin: 0; width: auto; }
+.mention .metrics { margin-left: auto; font-size: 0.85rem; }
+.set-sentiment { display: inline-flex; gap: 0.25rem; }
+.set-sentiment button.current { border-width: 2px; font-weight: 600; }
+
+/* Тональность: цвет только у точки, текст всегда цвета текста */
+.dot { display: inline-block; width: 0.6rem; height: 0.6rem; border-radius: 50%;
+  margin-right: 0.35rem; vertical-align: baseline; background: var(--s-unrated); }
+.s-negative .dot, .dot.s-negative { background: var(--s-negative); }
+.s-neutral .dot, .dot.s-neutral { background: var(--s-neutral); }
+.s-positive .dot, .dot.s-positive { background: var(--s-positive); }
+.s-unrated .dot, .dot.s-unrated { background: transparent; box-shadow: inset 0 0 0 1.5px var(--s-unrated); }
+.badge { font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+.badge small { font-weight: 400; color: var(--pico-muted-color); margin-left: 0.25rem; }
+
+/* Дашборд */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.75rem; }
+.tiles article { margin: 0; padding: 1rem; display: flex; flex-direction: column; gap: 0.15rem; }
+.tiles strong { font-size: 1.8rem; line-height: 1.2; }
+.tiles small { color: var(--pico-muted-color); }
+.legend { display: flex; flex-wrap: wrap; gap: 1rem; list-style: none; padding: 0; margin: 0 0 0.5rem; font-size: 0.85rem; }
+.legend li { list-style: none; margin: 0; }
+.chart-box { position: relative; height: 280px; }
+.pager { display: flex; gap: 1.5rem; justify-content: center; margin: 1.5rem 0; }
+table { font-size: 0.9rem; }
+
+@media (max-width: 640px) {
+  .mention .metrics { margin-left: 0; width: 100%; }
+}

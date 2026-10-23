@@ -2,7 +2,9 @@ from datetime import UTC, datetime
 
 from sqlalchemy import (
     BigInteger,
+    Boolean,
     DateTime,
+    Float,
     ForeignKey,
     Index,
     String,
@@ -26,6 +28,13 @@ class AuthorKind:
     CHANNEL = "channel"  # публичный Telegram-канал
     COMMUNITY = "community"  # сообщество ВК
     USER = "user"  # физлицо: только хэш ID, текст стирается по сроку хранения
+
+
+class Sentiment:
+    POSITIVE = "positive"
+    NEUTRAL = "neutral"
+    NEGATIVE = "negative"
+    ALL = (NEGATIVE, NEUTRAL, POSITIVE)  # порядок шкалы в интерфейсе
 
 
 class Document(Base):
@@ -68,7 +77,12 @@ class Mention(Base):
     document_id: Mapped[int] = mapped_column(ForeignKey("documents.id", ondelete="CASCADE"))
     brand_slug: Mapped[str] = mapped_column(String(64), index=True)
     matched: Mapped[list[str]] = mapped_column(ARRAY(Text))
-    sentiment: Mapped[str | None] = mapped_column(String(16))  # positive, neutral, negative
+    sentiment: Mapped[str | None] = mapped_column(String(16), index=True)  # см. Sentiment
+    sentiment_score: Mapped[float | None] = mapped_column(Float)  # уверенность модели
+    # Тональность поправил человек: модель её больше не перезаписывает.
+    sentiment_manual: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    # Пометка «мусор» из интерфейса. Скрываем из ленты, но храним: пригодится для обучения.
+    is_relevant: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     document: Mapped[Document] = relationship(back_populates="mentions")

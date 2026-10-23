@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Дашборд{% endblock %}
+{% block content %}
+{% set full = False %}
+{% include "_filters.html" %}
+
+{% set t = d.totals %}
+<section class="tiles">
+  <article><small>Упоминаний</small><strong>{{ t.total }}</strong></article>
+  <article><small><span class="dot s-negative" aria-hidden="true"></span>Негатив</small>
+    <strong>{{ t.negative }}</strong><small>{{ negative_share(t) | pct }} от оценённых</small></article>
+  <article><small><span class="dot s-neutral" aria-hidden="true"></span>Нейтрально</small><strong>{{ t.neutral }}</strong></article>
+  <article><small><span class="dot s-positive" aria-hidden="true"></span>Позитив</small><strong>{{ t.positive }}</strong></article>
+  {% if t.unrated %}<article><small>Без оценки</small><strong>{{ t.unrated }}</strong>
+    <small>запустите <code>mr sentiment</code></small></article>{% endif %}
+</section>
+
+<article>
+  <header><strong>Упоминания по дням</strong></header>
+  <ul class="legend">
+    {% for s in ('negative', 'neutral', 'positive', 'unrated') %}
+      <li><span class="dot s-{{ s }}" aria-hidden="true"></span>{{ SENTIMENT_LABELS[s] }}</li>
+    {% endfor %}
+  </ul>
+  <div class="chart-box"><canvas id="by-day" aria-label="Упоминания по дням с разбивкой по тональности" role="img"></canvas></div>
+  <details>
+    <summary>Таблица</summary>
+    <table class="striped">
+      <thead><tr><th>День</th><th>Всего</th>{% for s in ('negative', 'neutral', 'positive', 'unrated') %}<th>{{ SENTIMENT_LABELS[s] }}</th>{% endfor %}</tr></thead>
+      <tbody>
+        {% for r in d.days | reverse %}
+        <tr><td>{{ r.day.strftime('%d.%m.%Y') }}</td><td>{{ r.total }}</td>
+          <td>{{ r.negative }}</td><td>{{ r.neutral }}</td><td>{{ r.positive }}</td><td>{{ r.unrated }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </details>
+</article>
+
+<div class="grid">
+  <article>
+    <header><strong>Бренды</strong></header>
+    <table>
+      <thead><tr><th>Бренд</th><th>Всего</th><th>Негатив</th><th>Доля негатива</th></tr></thead>
+      <tbody>
+        {% for r in d.brands %}
+        <tr>
+          <td><a href="/?{{ f.query_string(brand=r.brand_slug) }}">{{ brands.get(r.brand_slug, r.brand_slug) }}</a></td>
+          <td>{{ r.total }}</td>
+          <td><a href="/?{{ f.query_string(brand=r.brand_slug, sentiment='negative') }}">{{ r.negative }}</a></td>
+          <td>{{ negative_share(r) | pct }}</td>
+        </tr>
+        {% else %}<tr><td colspan="4" class="muted">Нет данных</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </article>
+  <article>
+    <header><strong>Топ источников</strong></header>
+    <table>
+      <thead><tr><th>Источник</th><th>Всего</th><th>Негатив</th></tr></thead>
+      <tbody>
+        {% for r in d.sources %}
+        <tr>
+          <td>{{ r.source_name }} <small class="muted">{{ SOURCE_LABELS.get(r.source_type, r.source_type) }}</small></td>
+          <td>{{ r.total }}</td><td>{{ r.negative }}</td>
+        </tr>
+        {% else %}<tr><td colspan="3" class="muted">Нет данных</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </article>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='vendor/chart.umd.min.js') }}"></script>
+<script id="days-data" type="application/json">{{ chart_days | tojson }}</script>
+<script src="{{ url_for('static', path='dashboard.js') }}"></script>
+{% endblock %}

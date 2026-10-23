@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Лента{% endblock %}
+{% block content %}
+{% set full = True %}
+{% include "_filters.html" %}
+
+<p class="summary">
+  Найдено: <strong>{{ total }}</strong>
+  · <a href="/export.xlsx?{{ f.query_string() }}">Выгрузить в Excel</a>
+</p>
+
+{% for m, d in rows %}
+  {% include "_mention.html" %}
+{% else %}
+  <p class="muted">Упоминаний не найдено. Запустите сбор: <code>uv run mr collect</code></p>
+{% endfor %}
+
+{% if pages > 1 %}
+<nav class="pager">
+  {% if page > 1 %}<a href="?{{ f.query_string(page=page - 1) }}">← Новее</a>{% endif %}
+  <span>Страница {{ page }} из {{ pages }}</span>
+  {% if page < pages %}<a href="?{{ f.query_string(page=page + 1) }}">Старше →</a>{% endif %}
+</nav>
+{% endif %}
+{% endblock %}

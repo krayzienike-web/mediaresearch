@@ -1,0 +1,34 @@
+{# Общая форма фильтров. full=False — без поиска и тональности (для дашборда). #}
+<form method="get" class="filters">
+  <select name="brand" aria-label="Бренд">
+    <option value="">Все бренды</option>
+    {% for slug, name in brands.items() %}
+      <option value="{{ slug }}" {% if f.brand == slug %}selected{% endif %}>{{ name }}</option>
+    {% endfor %}
+  </select>
+  <select name="source" aria-label="Источник">
+    <option value="">Все источники</option>
+    {% for s in source_types %}
+      <option value="{{ s }}" {% if f.source == s %}selected{% endif %}>{{ SOURCE_LABELS.get(s, s) }}</option>
+    {% endfor %}
+  </select>
+  {% if full %}
+  <select name="sentiment" aria-label="Тональность">
+    <option value="">Любая тональность</option>
+    {% for s in SENTIMENTS + ('unrated',) %}
+      <option value="{{ s }}" {% if f.sentiment == s %}selected{% endif %}>{{ SENTIMENT_LABELS[s] }}</option>
+    {% endfor %}
+  </select>
+  {% endif %}
+  <input type="date" name="date_from" value="{{ f.date_from or '' }}" aria-label="С даты">
+  <input type="date" name="date_to" value="{{ f.date_to or '' }}" aria-label="По дату">
+  {% if full %}
+  <input type="search" name="q" value="{{ f.q }}" placeholder="Поиск по тексту" aria-label="Поиск">
+  {% endif %}
+  <label class="inline">
+    <input type="checkbox" name="show_irrelevant" value="1" {% if f.show_irrelevant %}checked{% endif %}>
+    показывать мусор
+  </label>
+  <button type="submit">Применить</button>
+  <a href="{{ request.url.path }}" role="button" class="secondary outline">Сбросить</a>
+</form>

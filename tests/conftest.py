@@ -3,7 +3,7 @@ import os
 import pytest
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import sessionmaker
 
 from mediaresearch.models import Base
 
@@ -13,7 +13,8 @@ TEST_DB = os.environ.get(
 
 
 @pytest.fixture
-def session():
+def clean_engine():
+    """Пустая тестовая БД без таблиц."""
     engine = create_engine(TEST_DB)
     try:
         with engine.connect() as conn:
@@ -21,7 +22,24 @@ def session():
     except OperationalError:
         pytest.skip(f"Нет тестовой БД ({TEST_DB})")
     Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
-    with Session(engine) as s:
-        yield s
+    with engine.begin() as conn:
+        conn.execute(text("drop table if exists alembic_version"))
+    yield engine
     engine.dispose()
+
+
+@pytest.fixture
+def engine(clean_engine):
+    Base.metadata.create_all(clean_engine)
+    return clean_engine
+
+
+@pytest.fixture
+def session_factory(engine):
+    return sessionmaker(engine, expire_on_commit=False)
+
+
+@pytest.fixture
+def session(session_factory):
+    with session_factory() as s:
+        yield s

@@ -7,7 +7,7 @@ from rich.console import Console
 from rich.table import Table
 from sqlalchemy import func, select
 
-from mediaresearch import pipeline
+from mediaresearch import pipeline, sentiment
 from mediaresearch.collectors import build_collectors
 from mediaresearch.config import load_brands, load_sources, settings
 from mediaresearch.db import init_db, make_session_factory
@@ -27,12 +27,25 @@ def main(verbose: Annotated[bool, typer.Option("-v", "--verbose")] = False):
 
 @app.command("init-db")
 def init_db_cmd():
-    """Создать таблицы в БД."""
+    """Создать или обновить таблицы в БД (миграции)."""
     init_db()
-    console.print("[green]Таблицы созданы[/]")
+    console.print("[green]Схема БД актуальна[/]")
 
 
-def _collect_once(only: list[str] | None) -> None:
+_analyzer: sentiment.Analyzer | None = None
+
+
+def _run_sentiment() -> None:
+    global _analyzer
+    if _analyzer is None:
+        _analyzer = sentiment.TransformersAnalyzer()
+    started = time.monotonic()
+    with make_session_factory()() as session:
+        n = sentiment.analyze_pending(session, _analyzer, load_brands())
+    console.print(f"[bold]тональность[/]: оценено {n} ({time.monotonic() - started:.1f} с)")
+
+
+def _collect_once(only: list[str] | None, with_sentiment: bool) -> None:
     brands = load_brands()
     collectors = build_collectors(load_sources())
     if only:
@@ -46,6 +59,8 @@ def _collect_once(only: list[str] | None) -> None:
             f"[bold]{name}[/]: просмотрено {stats.seen}, с брендами {stats.matched}, "
             f"новых упоминаний {stats.new_mentions} ({time.monotonic() - started:.1f} с)"
         )
+    if with_sentiment:
+        _run_sentiment()
 
 
 @app.command()
@@ -54,10 +69,16 @@ def collect(
         list[str] | None, typer.Option("--only", help="google_news, rss, telegram, vk")
     ] = None,
     every: Annotated[int, typer.Option(help="Повторять каждые N минут (0 — один раз)")] = 0,
+    with_sentiment: Annotated[
+        bool, typer.Option("--sentiment/--no-sentiment", help="Сразу оценить тональность")
+    ] = True,
 ):
     """Собрать публикации из включённых источников."""
+    if with_sentiment and not sentiment.ml_available():
+        console.print("[yellow]Модель тональности не установлена (uv sync), пропускаю оценку[/]")
+        with_sentiment = False
     while True:
-        _collect_once(only)
+        _collect_once(only, with_sentiment)
         if not every:
             break
         time.sleep(every * 60)
@@ -96,6 +117,27 @@ def stats():
         for slug, src, n in session.execute(q):
             table.add_row(slug, src, str(n))
     console.print(table)
+
+
+@app.command("sentiment")
+def sentiment_cmd():
+    """Оценить тональность упоминаний, у которых её ещё нет."""
+    _run_sentiment()
+
+
+@app.command()
+def web(
+    host: Annotated[str, typer.Option(help="0.0.0.0 — доступ из сети")] = "127.0.0.1",
+    port: int = 8000,
+    reload: Annotated[bool, typer.Option(help="Перезапуск при изменении кода")] = False,
+):
+    """Запустить веб-интерфейс."""
+    import uvicorn
+
+    console.print(f"Откройте http://{'localhost' if host == '127.0.0.1' else host}:{port}")
+    uvicorn.run(
+        "mediaresearch.web.app:create_app", factory=True, host=host, port=port, reload=reload
+    )
 
 
 @app.command()

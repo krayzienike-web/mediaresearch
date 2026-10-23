@@ -22,6 +22,15 @@ class Settings(BaseSettings):
     vk_service_token: str = ""
     vk_api_version: str = "5.199"
 
+    # Часовой пояс для отображения дат и разбивки по дням.
+    timezone: str = "Europe/Moscow"
+
+    sentiment_model: str = "cointegrated/rubert-tiny-sentiment-balanced"
+
+    # Если задан пароль, веб-интерфейс спрашивает логин и пароль (нужно на сервере).
+    web_username: str = "admin"
+    web_password: str = ""
+
     http_timeout: float = 20.0
     user_agent: str = "Mozilla/5.0 (compatible; mediaresearch/0.1)"
 

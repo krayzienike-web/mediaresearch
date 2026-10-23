@@ -1,0 +1,45 @@
+{% set s = m.sentiment or 'unrated' %}
+<article id="m-{{ m.id }}" class="mention {% if not m.is_relevant %}irrelevant{% endif %}">
+  <header class="meta">
+    <span>{{ d.published_at | local }}</span>
+    {% set src_label = SOURCE_LABELS.get(d.source_type, d.source_type) %}
+    <span>{{ src_label }}{% if d.source_name != src_label %} · {{ d.source_name }}{% endif %}</span>
+    <span class="brand">{{ brands.get(m.brand_slug, m.brand_slug) }}</span>
+    {% if not m.is_relevant %}<span class="tag">мусор</span>{% endif %}
+  </header>
+
+  {% if d.title %}<h4><a href="{{ d.url }}" target="_blank" rel="noopener">{{ d.title }}</a></h4>{% endif %}
+  {% if d.text %}
+    <p class="text">{{ d.text[:600] }}{% if d.text|length > 600 %}…{% endif %}</p>
+  {% elif not d.title %}
+    <p class="text muted">Текст удалён по сроку хранения</p>
+  {% endif %}
+  {% if not d.title %}<p><a href="{{ d.url }}" target="_blank" rel="noopener">Открыть публикацию</a></p>{% endif %}
+
+  <footer class="actions">
+    <span class="badge s-{{ s }}">
+      <span class="dot" aria-hidden="true"></span>{{ SENTIMENT_LABELS[s] }}
+      {% if m.sentiment_manual %}<small>(вручную)</small>
+      {% elif m.sentiment_score %}<small>{{ '%.0f' % (m.sentiment_score * 100) }}%</small>{% endif %}
+    </span>
+    <span class="set-sentiment">
+      {% for opt in SENTIMENTS %}
+        <button type="button" class="outline secondary s-{{ opt }} {% if opt == m.sentiment %}current{% endif %}"
+                hx-post="/mentions/{{ m.id }}/sentiment" hx-vals='{"sentiment": "{{ opt }}"}'
+                hx-target="#m-{{ m.id }}" hx-swap="outerHTML"
+                title="{{ SENTIMENT_LABELS[opt] }}"><span class="dot" aria-hidden="true"></span>{{ SENTIMENT_LABELS[opt] }}</button>
+      {% endfor %}
+    </span>
+    <button type="button" class="outline secondary"
+            hx-post="/mentions/{{ m.id }}/relevance" hx-target="#m-{{ m.id }}" hx-swap="outerHTML">
+      {% if m.is_relevant %}Мусор{% else %}Вернуть{% endif %}
+    </button>
+    {% set mt = d.metrics or {} %}
+    <span class="metrics muted">
+      {% if mt.views %}👁 {{ mt.views }}{% endif %}
+      {% if mt.likes %}♥ {{ mt.likes }}{% endif %}
+      {% if mt.reposts %}↻ {{ mt.reposts }}{% endif %}
+      {% if mt.comments %}💬 {{ mt.comments }}{% endif %}
+    </span>
+  </footer>
+</article>
