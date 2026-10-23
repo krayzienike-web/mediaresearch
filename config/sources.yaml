@@ -1,0 +1,35 @@
+# Источники. Адреса лент проверены не все: если лента отдаёт ошибку,
+# в логе будет предупреждение. Найдите актуальный адрес на сайте издания.
+
+google_news:
+  enabled: true
+
+rss:
+  - name: ТАСС
+    url: https://tass.ru/rss/v2.xml
+  - name: РИА Новости
+    url: https://ria.ru/export/rss2/archive/index.xml
+  - name: Интерфакс
+    url: https://www.interfax.ru/rss.asp
+  - name: Lenta.ru
+    url: https://lenta.ru/rss
+  - name: Коммерсантъ
+    url: https://www.kommersant.ru/RSS/news.xml
+  - name: РБК
+    url: https://rssexport.rbc.ru/rbcnews/news/30/full.rss
+  - name: Ведомости
+    url: https://www.vedomosti.ru/rss/news
+
+# Публичные каналы: имя из ссылки t.me/<имя>
+telegram:
+  - rbc_news
+  - tass_agency
+  - rian_ru
+  - interfaxonline
+  - banksta
+  - markettwits
+
+vk:
+  enabled: false  # включите, когда появятся токены (docs/vk-token.md)
+  # Короткие имена сообществ из ссылки vk.com/<имя>, стены которых читаем целиком
+  communities: []

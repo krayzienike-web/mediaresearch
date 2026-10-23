@@ -1,0 +1,32 @@
+{
+  "response": {
+    "items": [
+      {
+        "id": 555,
+        "owner_id": 123456,
+        "from_id": 123456,
+        "date": 1792750000,
+        "text": "Третий час не могу дозвониться в Сбербанк, это ужас",
+        "likes": {"count": 4},
+        "reposts": {"count": 0},
+        "comments": {"count": 2},
+        "views": {"count": 310}
+      },
+      {
+        "id": 777,
+        "owner_id": -98765,
+        "from_id": -98765,
+        "date": 1792751000,
+        "text": "Сбер запустил новую программу лояльности",
+        "likes": {"count": 120},
+        "reposts": {"count": 15},
+        "comments": {"count": 40},
+        "views": {"count": 25000}
+      }
+    ],
+    "profiles": [{"id": 123456, "first_name": "Иван", "last_name": "Иванов"}],
+    "groups": [{"id": 98765, "name": "Банки сегодня", "screen_name": "banks_today"}],
+    "count": 2,
+    "total_count": 2
+  }
+}

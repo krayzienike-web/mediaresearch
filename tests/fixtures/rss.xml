@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+<title>ТАСС</title>
+<item>
+  <title>«Магнит» открыл 100 новых магазинов в Сибири</title>
+  <link>https://tass.ru/ekonomika/1000001</link>
+  <guid>https://tass.ru/ekonomika/1000001</guid>
+  <pubDate>Fri, 23 Oct 2026 12:00:00 +0300</pubDate>
+  <description><![CDATA[<p>Ритейлер <b>«Магнит»</b> расширяет присутствие в регионе.</p>]]></description>
+</item>
+<item>
+  <title>Учёные создали сверхпрочный неодимовый магнит</title>
+  <link>https://tass.ru/nauka/1000002</link>
+  <pubDate>Fri, 23 Oct 2026 11:00:00 +0300</pubDate>
+  <description>Новый магнит выдерживает высокие температуры.</description>
+</item>
+<item>
+  <title>Погода в Москве на выходные</title>
+  <link>https://tass.ru/obschestvo/1000003</link>
+  <pubDate>Fri, 23 Oct 2026 10:00:00 +0300</pubDate>
+</item>
+</channel>
+</rss>
