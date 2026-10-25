@@ -13,7 +13,7 @@
 
 ## Быстрый старт
 
-**Подробная инструкция для новичков: [docs/getting-started.md](docs/getting-started.md).**
+**Подробная инструкция для новичков: [Windows](docs/windows.md) · [все системы](docs/getting-started.md).**
 
 Кратко (нужны [uv](https://docs.astral.sh/uv/) и Docker):
 
@@ -46,6 +46,7 @@ uv run alembic revision --autogenerate -m "что изменилось"   # по
 
 ## Документация
 
+- [Запуск на Windows по шагам](docs/windows.md)
 - [Запуск с нуля](docs/getting-started.md)
 - [План проекта](docs/plan.md)
 - [ADR 0001 — персональные данные](docs/adr/0001-personal-data.md)
